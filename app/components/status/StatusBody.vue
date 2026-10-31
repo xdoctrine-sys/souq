@@ -49,6 +49,7 @@ const vnode = computed(() => {
       <component :is="vnode" v-if="vnode" />
     </span>
     <div v-else />
+    <SouqListingCard :status="status" />
     <StatusQuote :status="status" :is-nested="isNested" />
     <template v-if="translation.visible">
       <div my2 h-px border="b base" bg-base />
