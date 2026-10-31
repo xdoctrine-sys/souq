@@ -646,6 +646,29 @@
     "hint": "In order to share content with Elk, Elk must be installed and you must be signed in.",
     "title": "Share with Elk"
   },
+  "souq": {
+    "listing": {
+      "category_unknown": "Uncategorized",
+      "location_unknown": "Unknown location",
+      "price": {
+        "free": "Free",
+        "negotiable": "Negotiable",
+        "on_request": "Price on request",
+        "period": {
+          "day": "per day",
+          "month": "per month",
+          "week": "per week",
+          "year": "per year"
+        },
+        "unknown": "Price not available"
+      },
+      "state": {
+        "expired": "Expired",
+        "reserved": "Reserved",
+        "sold": "Sold"
+      }
+    }
+  },
   "state": {
     "attachments_exceed_server_limit": "The number of attachments exceeded the limit per post.",
     "attachments_limit_audio_error": "Maximum audio size exceeded: {0}",

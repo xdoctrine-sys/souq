@@ -560,6 +560,29 @@
     "hint": "لمشاركة المحتوى مع Elk ، يجب تثبيت Elk ويجب تسجيل الدخول.",
     "title": "شارك مع Elk"
   },
+  "souq": {
+    "listing": {
+      "category_unknown": "غير مصنف",
+      "location_unknown": "موقع غير معروف",
+      "price": {
+        "free": "مجاني",
+        "negotiable": "قابل للتفاوض",
+        "on_request": "السعر عند الطلب",
+        "period": {
+          "day": "يوميا",
+          "month": "شهريا",
+          "week": "أسبوعيا",
+          "year": "سنويا"
+        },
+        "unknown": "السعر غير متوفر"
+      },
+      "state": {
+        "expired": "منتهي",
+        "reserved": "محجوز",
+        "sold": "مباع"
+      }
+    }
+  },
   "state": {
     "attachments_exceed_server_limit": "تجاوز عدد المرفقات الحد الأقصى لكل منشور.",
     "attachments_limit_error": "تجاوز الحد لل منشور",
