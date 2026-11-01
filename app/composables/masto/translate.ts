@@ -145,24 +145,24 @@ export async function useTranslation(status: mastodon.v1.Status | mastodon.v1.St
         },
       }
       if (translationAPISupported && 'language' in status) {
-        let sourceLanguage = status.language
-        if (!sourceLanguage) {
-          const languageDetector = await (globalThis as any).LanguageDetector.create()
-          // Make sure HTML markup doesn't derail language detection.
-          const div = document.createElement('div')
-          div.innerHTML = status.content
-          // eslint-disable-next-line unicorn/prefer-dom-node-text-content
-          const detectedLanguages = await languageDetector.detect(div.innerText)
-          sourceLanguage = detectedLanguages[0].detectedLanguage
-          if (sourceLanguage === 'und') {
-            throw new Error('Could not detect source language.')
-          }
-        }
-        const translator = await (globalThis as any).Translator.create({
-          sourceLanguage,
-          targetLanguage: to,
-        })
         try {
+          let sourceLanguage = status.language
+          if (!sourceLanguage) {
+            const languageDetector = await (globalThis as any).LanguageDetector.create()
+            // Make sure HTML markup doesn't derail language detection.
+            const div = document.createElement('div')
+            div.innerHTML = status.content
+            // eslint-disable-next-line unicorn/prefer-dom-node-text-content
+            const detectedLanguages = await languageDetector.detect(div.innerText)
+            sourceLanguage = detectedLanguages[0].detectedLanguage
+            if (sourceLanguage === 'und') {
+              throw new Error('Could not detect source language.')
+            }
+          }
+          const translator = await (globalThis as any).Translator.create({
+            sourceLanguage,
+            targetLanguage: to,
+          })
           let text = await translator.translate(status.content)
           text = replaceTranslatedLinksWithOriginal(text)
           translated.value = {
@@ -172,6 +172,8 @@ export async function useTranslation(status: mastodon.v1.Status | mastodon.v1.St
           }
         }
         catch (error) {
+          // Model creation can reject (model not available) just like `translate()`;
+          // surface it as a translation error so `toggle()` never rejects.
           translated.value = {
             error: (error as Error).message,
             text: '',

@@ -342,7 +342,10 @@ const userSettings = useUserSettings()
 const optimizeForLowPerformanceDevice = computed(() => getPreferences(userSettings.value, 'optimizeForLowPerformanceDevice'))
 
 const languageDetectorInGlobalThis = 'LanguageDetector' in globalThis
-let supportsLanguageDetector = !optimizeForLowPerformanceDevice.value && languageDetectorInGlobalThis && await (globalThis as any).LanguageDetector.availability() === 'available'
+// Language detection is best-effort: the browser may expose the on-device model API
+// while the model itself is unavailable, so both the availability probe and the
+// model creation can reject. Neither must break the composer.
+let supportsLanguageDetector = !optimizeForLowPerformanceDevice.value && languageDetectorInGlobalThis && await (globalThis as any).LanguageDetector.availability().then((availability: string) => availability === 'available').catch(() => false)
 let languageDetector: { detect: (arg0: string, option: { signal: AbortSignal }) => any }
 // If the API is supported, but the model not loaded yet…
 if (languageDetectorInGlobalThis && !supportsLanguageDetector) {
@@ -350,6 +353,9 @@ if (languageDetectorInGlobalThis && !supportsLanguageDetector) {
   (globalThis as any).LanguageDetector.create().then((_languageDetector: { detect: (arg0: string) => any }) => {
     supportsLanguageDetector = true
     languageDetector = _languageDetector
+  }).catch(() => {
+    // Keep detection disabled instead of leaving an unhandled rejection behind.
+    supportsLanguageDetector = false
   })
 }
 
@@ -367,7 +373,16 @@ const detectLanguage = useDebounceFn(async () => {
   }
   if (!languageDetector) {
     // maybe we dont want to mess with this with abort....
-    languageDetector = await (globalThis as any).LanguageDetector.create()
+    try {
+      languageDetector = await (globalThis as any).LanguageDetector.create()
+    }
+    catch {
+      // The API can be advertised as available while the on-device model still fails to
+      // load (`NotSupportedError`). Keep detection disabled, leave the currently chosen
+      // language untouched and never break the composer with an unhandled rejection.
+      supportsLanguageDetector = false
+      return
+    }
   }
   // we stop previously running language detection process
   detectLanguageAbortController.abort()
