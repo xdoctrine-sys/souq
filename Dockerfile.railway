@@ -28,6 +28,13 @@ RUN pnpm nuxt prepare
 # Run full install with every postinstall script ( This needs project file )
 RUN pnpm i --frozen-lockfile
 
+# Railway only exposes service variables to `docker build` when the Dockerfile declares them with ARG.
+# These non-secret values are consumed by `pnpm build` (public runtimeConfig defaults and storage driver),
+# which are baked into the prerendered pages; only these three are declared.
+ARG NUXT_PUBLIC_DEFAULT_SERVER
+ARG NUXT_PUBLIC_SINGLE_INSTANCE
+ARG NUXT_STORAGE_DRIVER
+
 # Build
 RUN NODE_OPTIONS="--max-old-space-size=6144" pnpm build
 
