@@ -244,6 +244,8 @@ describe('publish form when the on-device model API is broken', () => {
 
     expect(model.publish).toHaveBeenCalledTimes(1)
     expect(unhandled).toEqual([])
+    // `onErrorCaptured` must not have swallowed any Vue error along the way.
+    expect(errors).toEqual([])
     wrapper.unmount()
   })
 
@@ -251,7 +253,7 @@ describe('publish form when the on-device model API is broken', () => {
     model.availability.mockResolvedValue('unavailable')
     model.create.mockRejectedValue(new Error('Model not available'))
 
-    const { wrapper } = await mountForm()
+    const { wrapper, errors } = await mountForm()
     await flushRejections()
 
     await wrapper.find('.publish-button').trigger('click')
@@ -259,6 +261,7 @@ describe('publish form when the on-device model API is broken', () => {
 
     expect(model.publish).toHaveBeenCalledTimes(1)
     expect(unhandled).toEqual([])
+    expect(errors).toEqual([])
     wrapper.unmount()
   })
 
@@ -266,7 +269,7 @@ describe('publish form when the on-device model API is broken', () => {
     model.availability.mockResolvedValue('available')
     model.create.mockRejectedValue(new Error('Model not available'))
 
-    const { wrapper, draftItem } = await mountForm()
+    const { wrapper, draftItem, errors } = await mountForm()
     expect(draftItem.params.language).toBe('ar')
 
     await wrapper.find('.editor-content-stub').trigger('keyup')
@@ -283,6 +286,7 @@ describe('publish form when the on-device model API is broken', () => {
     await wrapper.find('.publish-button').trigger('click')
     await flushRejections()
     expect(model.publish).toHaveBeenCalledTimes(1)
+    expect(errors).toEqual([])
     wrapper.unmount()
   })
 })
