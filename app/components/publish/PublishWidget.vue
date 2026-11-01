@@ -373,7 +373,16 @@ const detectLanguage = useDebounceFn(async () => {
   }
   if (!languageDetector) {
     // maybe we dont want to mess with this with abort....
-    languageDetector = await (globalThis as any).LanguageDetector.create()
+    try {
+      languageDetector = await (globalThis as any).LanguageDetector.create()
+    }
+    catch {
+      // The API can be advertised as available while the on-device model still fails to
+      // load (`NotSupportedError`). Keep detection disabled, leave the currently chosen
+      // language untouched and never break the composer with an unhandled rejection.
+      supportsLanguageDetector = false
+      return
+    }
   }
   // we stop previously running language detection process
   detectLanguageAbortController.abort()
